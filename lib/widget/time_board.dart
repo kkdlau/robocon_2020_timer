@@ -291,6 +291,17 @@ class _TimeBoardState extends State<TimeBoard> {
               rows: team.redTeamData,
             ),
           ),
+        ),
+        Row(
+          children: <Widget>[
+            Expanded(
+                child: OutlineButton(
+                    borderSide: BorderSide(color: Colors.white, width: 2.0),
+                    onPressed: null,
+                    child: Text('Upload to server (Coming soon)'),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0))))
+          ],
         )
       ],
     );
