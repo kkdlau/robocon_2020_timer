@@ -5,12 +5,16 @@ import 'package:provider/provider.dart';
 import 'package:robocon_2020_timer/widget/ball.dart';
 import 'package:robocon_2020_timer/widget/count_timer.dart';
 import 'package:robocon_2020_timer/widget/change_notifier.dart';
+import 'package:robocon_2020_timer/widget/side_board.dart';
+import 'package:robocon_2020_timer/widget/team.dart';
 import 'package:robocon_2020_timer/widget/team_notifier.dart';
 
 enum GameState { Preparation, Versus, Waiting }
 
 class TimeBoard extends StatefulWidget {
-  TimeBoard({Key key}) : super(key: key);
+  final GlobalKey blue;
+  final GlobalKey red;
+  TimeBoard({Key key, this.blue, this.red}) : super(key: key);
 
   @override
   _TimeBoardState createState() => _TimeBoardState();
@@ -40,7 +44,27 @@ class _TimeBoardState extends State<TimeBoard> {
         Provider.of<Notifier<GameState>>(context, listen: false);
     final Notifier<CountTimer> timerProvider =
         Provider.of<Notifier<CountTimer>>(context, listen: false);
+    final Notifier<int> kickBall =
+        Provider.of<Notifier<int>>(context, listen: false);
+    final TeamNotifier team = Provider.of<TeamNotifier>(context, listen: false);
     setState(() {
+      print(GlobalKey<SideBoardState>().currentState);
+      team.blueTeamData = [
+        DataRow(cells: <DataCell>[
+          DataCell(Text('---')),
+          DataCell(Text('Welcome to Robocon 2020!'))
+        ])
+      ];
+      team.redTeamData = [
+        DataRow(cells: <DataCell>[
+          DataCell(Text('---')),
+          DataCell(Text('Welcome to Robocon 2020!'))
+        ])
+      ];
+      team.redTeamInfo = TeamInfo();
+      team.blueTeamInfo = TeamInfo();
+      team.update();
+      kickBall.informListener(7);
       timerProvider.informListener(timer);
       gameStateProvider.informListener(state);
       canPause = true;
@@ -121,6 +145,7 @@ class _TimeBoardState extends State<TimeBoard> {
     final Notifier<List<Color>> bgColor =
         Provider.of<Notifier<List<Color>>>(context);
     final TeamNotifier team = Provider.of<TeamNotifier>(context, listen: false);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,

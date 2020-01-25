@@ -3,41 +3,34 @@ import 'package:provider/provider.dart';
 import 'package:robocon_2020_timer/widget/ball.dart';
 import 'package:robocon_2020_timer/widget/change_notifier.dart';
 import 'package:robocon_2020_timer/widget/count_timer.dart';
+import 'package:robocon_2020_timer/widget/team.dart';
 import 'package:robocon_2020_timer/widget/team_notifier.dart';
 import 'package:robocon_2020_timer/widget/time_board.dart';
 
 class SideBoard extends StatefulWidget {
   final Color teamColor;
-  SideBoard({Key key, this.teamColor}) : super(key: key);
+  final bool renew;
+  SideBoard({Key key, this.teamColor, this.renew}) : super(key: key);
 
   @override
-  _SideBoardState createState() => _SideBoardState();
+  SideBoardState createState() => SideBoardState();
 }
 
-class _SideBoardState extends State<SideBoard> {
-  int freeRugby;
-  int availableTryBall = 0;
-  int availableScoreBall = 0;
-  int score = 0;
-  int retry = 0;
-  int violation = 0;
-  int availableKickBall = 0;
-
-  List<Object> action = [];
-  @override
-  void initState() {
-    super.initState();
-    freeRugby = 5;
-  }
-
+class SideBoardState extends State<SideBoard> {
   List<Widget> availableRugby() {
+    final TeamNotifier team = Provider.of<TeamNotifier>(context, listen: false);
+    TeamInfo info;
     List<Widget> rugby = [Text('Available try ball: ')];
-    for (int i = 0; i < freeRugby; i++) {
+    if (widget.teamColor == Colors.red[900])
+      info = team.redTeamInfo;
+    else
+      info = team.blueTeamInfo;
+    for (int i = 0; i < info.freeRugby; i++) {
       rugby.add(Ball(
         color: Colors.white70,
       ));
     }
-    for (int i = freeRugby; i < 5; i++) {
+    for (int i = info.freeRugby; i < 5; i++) {
       rugby.add(Ball(
         fill: false,
         color: Colors.white70,
@@ -79,16 +72,22 @@ class _SideBoardState extends State<SideBoard> {
 
   @override
   Widget build(BuildContext context) {
-    final kickBallProvider = Provider.of<Notifier<int>>(context);
+    final Notifier<int> kickBallProvider = Provider.of<Notifier<int>>(context);
     final Notifier<GameState> gameState =
         Provider.of<Notifier<GameState>>(context);
+    final TeamNotifier team = Provider.of<TeamNotifier>(context);
+    TeamInfo info;
+    if (widget.teamColor == Colors.red[900])
+      info = team.redTeamInfo;
+    else
+      info = team.blueTeamInfo;
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          Text(score.toString(),
+          Text(info.score.toString(),
               textAlign: TextAlign.center,
               style: Theme.of(context)
                   .textTheme
@@ -102,7 +101,7 @@ class _SideBoardState extends State<SideBoard> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Text(
-                    'R:' + retry.toString(),
+                    'R:' + info.retry.toString(),
                     style: Theme.of(context).textTheme.display2,
                   ),
                   OutlineButton(
@@ -110,8 +109,9 @@ class _SideBoardState extends State<SideBoard> {
                       onPressed: gameState.data == GameState.Versus
                           ? () {
                               setState(() {
-                                retry++;
+                                info.retry++;
                                 informListener('Asked for retry.');
+                                team.update();
                               });
                             }
                           : null,
@@ -124,7 +124,7 @@ class _SideBoardState extends State<SideBoard> {
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   Text(
-                    'V: ' + violation.toString(),
+                    'V: ' + info.violation.toString(),
                     style: Theme.of(context).textTheme.display2,
                   ),
                   OutlineButton(
@@ -132,7 +132,8 @@ class _SideBoardState extends State<SideBoard> {
                       onPressed: gameState.data == GameState.Versus
                           ? () {
                               setState(() {
-                                violation++;
+                                info.violation++;
+                                team.update();
                                 informListener('Acted in violation.');
                               });
                             }
@@ -156,12 +157,13 @@ class _SideBoardState extends State<SideBoard> {
                       borderSide: BorderSide(color: Colors.white, width: 2.0),
                       onPressed: gameState.data == GameState.Versus
                           ? () {
-                              if (freeRugby > 0)
+                              if (info.freeRugby > 0)
                                 setState(() {
-                                  freeRugby--;
-                                  availableTryBall++;
+                                  info.freeRugby--;
+                                  info.availableTryBall++;
                                   informListener('Got 1 try ball. Ramained: ' +
-                                      freeRugby.toString());
+                                      info.freeRugby.toString());
+                                  team.update();
                                 });
                             }
                           : null,
@@ -175,15 +177,16 @@ class _SideBoardState extends State<SideBoard> {
                   child: OutlineButton(
                       borderSide: BorderSide(color: Colors.white, width: 2.0),
                       onPressed: gameState.data == GameState.Versus &&
-                              availableTryBall > 0
+                              info.availableTryBall > 0
                           ? () {
                               setState(() {
-                                score++;
-                                availableTryBall--;
-                                availableScoreBall++;
+                                info.score++;
+                                info.availableTryBall--;
+                                info.availableScoreBall++;
                                 informListener(
                                     'Received ball. Current Score: ' +
-                                        score.toString());
+                                        info.score.toString());
+                                team.update();
                               });
                             }
                           : null,
@@ -197,14 +200,15 @@ class _SideBoardState extends State<SideBoard> {
                   child: OutlineButton(
                       borderSide: BorderSide(color: Colors.white, width: 2.0),
                       onPressed: gameState.data == GameState.Versus &&
-                              availableScoreBall > 0
+                              info.availableScoreBall > 0
                           ? () {
                               setState(() {
-                                score += 2;
-                                availableScoreBall--;
+                                info.score += 2;
+                                info.availableScoreBall--;
                                 informListener(
                                     'Scored spots, got 2 points! Current score: ' +
-                                        score.toString());
+                                        info.score.toString());
+                                team.update();
                               });
                             }
                           : null,
@@ -222,11 +226,12 @@ class _SideBoardState extends State<SideBoard> {
                         ? () {
                             if (kickBallProvider.data > 0)
                               setState(() {
-                                availableKickBall++;
+                                info.availableKickBall++;
                                 kickBallProvider
                                     .informListener(kickBallProvider.data - 1);
                                 informListener('Got 1 kick ball. Remaining: ' +
                                     kickBallProvider.data.toString());
+                                team.update();
                               });
                           }
                         : null,
@@ -244,10 +249,11 @@ class _SideBoardState extends State<SideBoard> {
                     onPressed: gameState.data == GameState.Versus
                         ? () {
                             setState(() {
-                              score += 10;
+                              info.score += 10;
                               informListener(
                                   'Miss shooting from opponent. Current Score: ' +
-                                      score.toString());
+                                      info.score.toString());
+                              team.update();
                             });
                           }
                         : null,
@@ -265,14 +271,15 @@ class _SideBoardState extends State<SideBoard> {
               OutlineButton(
                   borderSide: BorderSide(color: Colors.white, width: 2.0),
                   onPressed: gameState.data == GameState.Versus &&
-                          availableKickBall > 0
+                          info.availableKickBall > 0
                       ? () {
                           setState(() {
-                            score += 5;
-                            availableKickBall--;
+                            info.score += 5;
+                            info.availableKickBall--;
                             informListener(
                                 'Successfully kicked ball at Z1. Current Score: ' +
-                                    score.toString());
+                                    info.score.toString());
+                            team.update();
                           });
                         }
                       : null,
@@ -282,14 +289,15 @@ class _SideBoardState extends State<SideBoard> {
               OutlineButton(
                   borderSide: BorderSide(color: Colors.white, width: 2.0),
                   onPressed: gameState.data == GameState.Versus &&
-                          availableKickBall > 0
+                          info.availableKickBall > 0
                       ? () {
                           setState(() {
-                            score += 10;
-                            availableKickBall--;
+                            info.score += 10;
+                            info.availableKickBall--;
                             informListener(
                                 'Successfully kicked ball at Z2. Current Score: ' +
-                                    score.toString());
+                                    info.score.toString());
+                            team.update();
                           });
                         }
                       : null,
@@ -299,14 +307,15 @@ class _SideBoardState extends State<SideBoard> {
               OutlineButton(
                   borderSide: BorderSide(color: Colors.white, width: 2.0),
                   onPressed: gameState.data == GameState.Versus &&
-                          availableKickBall > 0
+                          info.availableKickBall > 0
                       ? () {
                           setState(() {
-                            score += 20;
-                            availableKickBall--;
+                            info.score += 20;
+                            info.availableKickBall--;
                             informListener(
                                 'Successfully kicked ball at Z3. Current Score: ' +
-                                    score.toString());
+                                    info.score.toString());
+                            team.update();
                           });
                         }
                       : null,

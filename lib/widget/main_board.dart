@@ -15,7 +15,9 @@ class MainBoard extends StatelessWidget {
     final Notifier<List<Color>> bgColor =
         Provider.of<Notifier<List<Color>>>(context);
     final Widget blueTeam = Expanded(
-      child: SideBoard(teamColor: bgColor.data[0]),
+      child: SideBoard(
+        teamColor: bgColor.data[0],
+      ),
     );
     final Widget redTeam = Expanded(
       child: SideBoard(
