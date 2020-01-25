@@ -1,8 +1,9 @@
 # Robocon 2020 Timer
 
-A cross-platform timer and scoreboard which desgin for robocon 2020.
+A cross-platform timer and scoreboard which desgins for robocon 2020.
 
 ## Supported platform
+
 * iOS
 * Android
 * Web
@@ -13,6 +14,9 @@ To debug this project, install Flutter plugin in VScode, and follow the [guideli
 
 ## Deployment
 
-For details, read [this](https://flutter.dev/docs/deployment/web).
+https://kkdlau.student.ust.hk
 
-The github page is built by Flutter build web
+## TODO
+
+* add backend support (upload files, review records)
+
