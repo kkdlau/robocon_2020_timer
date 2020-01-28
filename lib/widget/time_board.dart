@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'dart:core';
+import 'dart:convert';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:robocon_2020_timer/widget/ball.dart';
 import 'package:robocon_2020_timer/widget/count_timer.dart';
 import 'package:robocon_2020_timer/widget/change_notifier.dart';
-import 'package:robocon_2020_timer/widget/side_board.dart';
 import 'package:robocon_2020_timer/widget/team.dart';
 import 'package:robocon_2020_timer/widget/team_notifier.dart';
+import 'package:http/http.dart' as http;
 
-enum GameState { Preparation, Versus, Waiting }
+enum GameState { Preparation, Versus, Waiting, End }
 
 class TimeBoard extends StatefulWidget {
   final GlobalKey blue;
@@ -48,7 +49,6 @@ class _TimeBoardState extends State<TimeBoard> {
         Provider.of<Notifier<int>>(context, listen: false);
     final TeamNotifier team = Provider.of<TeamNotifier>(context, listen: false);
     setState(() {
-      print(GlobalKey<SideBoardState>().currentState);
       team.blueTeamData = [
         DataRow(cells: <DataCell>[
           DataCell(Text('---')),
@@ -60,6 +60,13 @@ class _TimeBoardState extends State<TimeBoard> {
           DataCell(Text('---')),
           DataCell(Text('Welcome to Robocon 2020!'))
         ])
+      ];
+
+      team.redTeamLog = [
+        ['---', 'Welcome to Robocon 2020!']
+      ];
+      team.blueTeamLog = [
+        ['---', 'Welcome to Robocon 2020!']
       ];
       team.redTeamInfo = TeamInfo();
       team.blueTeamInfo = TeamInfo();
@@ -99,7 +106,7 @@ class _TimeBoardState extends State<TimeBoard> {
       if (gameStateProvider.data == GameState.Versus) {
         timer = CountTimer(duration: Duration(seconds: 0));
         setState(() {
-          gameStateProvider.informListener(GameState.Waiting);
+          gameStateProvider.informListener(GameState.End);
           canStart = true;
           canPause = false;
           timePrint = timer.toTimeString();
@@ -140,12 +147,54 @@ class _TimeBoardState extends State<TimeBoard> {
     return rugby;
   }
 
+  void uploadToServer() {
+    final TeamNotifier team = Provider.of<TeamNotifier>(context, listen: false);
+    final Notifier<int> kickBallProvider =
+        Provider.of<Notifier<int>>(context, listen: false);
+    Map<String, dynamic> export = {'kickBall': kickBallProvider.data};
+    export['rt'] = {'sb': team.redTeamInfo.toMap(), 'log': team.redTeamLog};
+
+    export['bt'] = {'sb': team.blueTeamInfo.toMap(), 'log': team.blueTeamLog};
+
+    http
+        .get('http://kkdlau.student.ust.hk/upload.php?password=3211&content=' +
+            json.encode(export))
+        .then((onValue) {
+      String content = '';
+      if (onValue.statusCode != 200)
+        content = 'Error ' + onValue.statusCode.toString();
+      else
+        content = 'Uploaded successfully.';
+      showDialog(
+          context: context,
+          builder: (buildContext) {
+            return AlertDialog(
+              backgroundColor:
+                  onValue.statusCode == 200 ? Colors.green[600] : null,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
+              title: Text('Upload result'),
+              content: Text(content),
+              actions: <Widget>[
+                MaterialButton(
+                  child: Text('Close'),
+                  onPressed: () {
+                    if (Navigator.canPop(context)) Navigator.pop(context);
+                  },
+                )
+              ],
+            );
+          });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final Notifier<List<Color>> bgColor =
         Provider.of<Notifier<List<Color>>>(context);
     final TeamNotifier team = Provider.of<TeamNotifier>(context, listen: false);
-
+    final Notifier<GameState> gameStateProvider =
+        Provider.of<Notifier<GameState>>(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -259,6 +308,7 @@ class _TimeBoardState extends State<TimeBoard> {
                     presentTime = Duration(minutes: 1);
                   else
                     presentTime = Duration(minutes: 3);
+                  timer = CountTimer(duration: presentTime);
                   timePrint = timer.toTimeString();
                 });
               },
@@ -281,15 +331,17 @@ class _TimeBoardState extends State<TimeBoard> {
               style: TextStyle(color: Colors.blue, fontFamily: 'BreeSerif')),
         ),
         Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: DataTable(
-              headingRowHeight: 30.0,
-              columns: <DataColumn>[
-                DataColumn(label: Text('Time')),
-                DataColumn(label: Text('Event'))
-              ],
-              rows: team.blueTeamData,
+          child: Scrollbar(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: DataTable(
+                headingRowHeight: 30.0,
+                columns: <DataColumn>[
+                  DataColumn(label: Text('Time')),
+                  DataColumn(label: Text('Event'))
+                ],
+                rows: team.blueTeamData,
+              ),
             ),
           ),
         ),
@@ -305,27 +357,34 @@ class _TimeBoardState extends State<TimeBoard> {
           ),
         ),
         Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: DataTable(
-              headingRowHeight: 30.0,
-              columns: <DataColumn>[
-                DataColumn(label: Text('Time')),
-                DataColumn(label: Text('Event'))
-              ],
-              rows: team.redTeamData,
+          child: Scrollbar(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: DataTable(
+                headingRowHeight: 30.0,
+                columns: <DataColumn>[
+                  DataColumn(label: Text('Time')),
+                  DataColumn(label: Text('Event'))
+                ],
+                rows: team.redTeamData,
+              ),
             ),
           ),
         ),
         Row(
           children: <Widget>[
             Expanded(
-                child: OutlineButton(
-                    borderSide: BorderSide(color: Colors.white, width: 2.0),
-                    onPressed: null,
-                    child: Text('Upload to server (Coming soon)'),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0))))
+                child: Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: OutlineButton(
+                  borderSide: BorderSide(color: Colors.white, width: 2.0),
+                  onPressed: gameStateProvider.data == GameState.End
+                      ? uploadToServer
+                      : null,
+                  child: Text('Upload to server'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0))),
+            ))
           ],
         )
       ],

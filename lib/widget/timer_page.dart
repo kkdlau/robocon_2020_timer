@@ -27,6 +27,10 @@ class TimerPage extends StatelessWidget {
                     DataCell(Text('---')),
                     DataCell(Text('Welcome to Robocon 2020!'))
                   ])
+                ], redTeamLog: [
+                  ['---', 'Welcome to Robocon 2020!']
+                ], blueTeamLog: [
+                  ['---', 'Welcome to Robocon 2020!']
                 ], blueTeamData: [
                   DataRow(cells: <DataCell>[
                     DataCell(Text('---')),

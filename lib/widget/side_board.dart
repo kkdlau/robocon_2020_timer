@@ -43,20 +43,23 @@ class SideBoardState extends State<SideBoard> {
     final TeamNotifier team = Provider.of<TeamNotifier>(context, listen: false);
     final Notifier<CountTimer> timerProvider =
         Provider.of<Notifier<CountTimer>>(context, listen: false);
-    if (widget.teamColor == Colors.red[900])
+    if (widget.teamColor == Colors.red[900]) {
       team.redTeamData.insert(
           0,
           DataRow(cells: <DataCell>[
             DataCell(Text(timerProvider.data.toTimeString())),
             DataCell(Text(message)),
           ]));
-    else
+      team.redTeamLog.insert(0, [timerProvider.data.toTimeString(), message]);
+    } else {
       team.blueTeamData.insert(
           0,
           DataRow(cells: <DataCell>[
             DataCell(Text(timerProvider.data.toTimeString())),
             DataCell(Text(message)),
           ]));
+      team.blueTeamLog.insert(0, [timerProvider.data.toTimeString(), message]);
+    }
     team.update();
   }
 
@@ -204,6 +207,7 @@ class SideBoardState extends State<SideBoard> {
                           ? () {
                               setState(() {
                                 info.score += 2;
+                                info.scoredSpot += 1;
                                 info.availableScoreBall--;
                                 informListener(
                                     'Scored spots, got 2 points! Current score: ' +
@@ -222,17 +226,19 @@ class SideBoardState extends State<SideBoard> {
               Expanded(
                 child: OutlineButton(
                     borderSide: BorderSide(color: Colors.white, width: 2.0),
-                    onPressed: gameState.data == GameState.Versus
+                    onPressed: gameState.data == GameState.Versus &&
+                            info.scoredSpot > 0 &&
+                            kickBallProvider.data > 0
                         ? () {
-                            if (kickBallProvider.data > 0)
-                              setState(() {
-                                info.availableKickBall++;
-                                kickBallProvider
-                                    .informListener(kickBallProvider.data - 1);
-                                informListener('Got 1 kick ball. Remaining: ' +
-                                    kickBallProvider.data.toString());
-                                team.update();
-                              });
+                            setState(() {
+                              info.availableKickBall++;
+                              info.scoredSpot--;
+                              kickBallProvider
+                                  .informListener(kickBallProvider.data - 1);
+                              informListener('Got 1 kick ball. Remaining: ' +
+                                  kickBallProvider.data.toString());
+                              team.update();
+                            });
                           }
                         : null,
                     child: Text('Got kick ball'),
