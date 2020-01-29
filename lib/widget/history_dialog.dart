@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:html' as html;
 
 class HistoryDialog extends StatefulWidget {
   HistoryDialog({Key key}) : super(key: key);
@@ -52,13 +53,24 @@ class _HistoryDialogState extends State<HistoryDialog> {
                                   onPressed: () {
                                     http
                                         .get(
-                                            'http://kkdlau.student.ust.hk/get_json.php?path=' +
+                                            'http://kkdlau.student.ust.hk/download.php?path=' +
                                                 files[index])
                                         .then((onValue) {
                                       if (onValue.statusCode == 200) {
                                         Navigator.pop(context, onValue.body);
                                       }
                                     });
+                                  },
+                                ),
+                                IconButton(
+                                  color: Colors.blue,
+                                  icon: Icon(Icons.cloud_download),
+                                  onPressed: () {
+                                    html.window.open(
+                                        'http://kkdlau.student.ust.hk/download.php?path=' +
+                                            files[index] +
+                                            '&isDownload=true',
+                                        'name');
                                   },
                                 ),
                                 IconButton(
