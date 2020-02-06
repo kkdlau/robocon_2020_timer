@@ -22,20 +22,25 @@ class TimeBoard extends StatefulWidget {
 }
 
 class _TimeBoardState extends State<TimeBoard> {
-  int _select = 0;
+  int _select;
   CountTimer timer;
   String timePrint;
   Duration presentTime = Duration(milliseconds: 0);
 
-  bool canStart = true;
-  bool canPause = true;
-  bool _oneMinutePre = true;
+  bool canStart;
+  bool canPause;
+  bool _oneMinutePre;
 
   @override
   void initState() {
     super.initState();
+    _select = 1;
+    canStart = true;
+    canPause = true;
+    _oneMinutePre = true;
     timer = CountTimer(duration: Duration(minutes: 1));
     presentTime = Duration(minutes: 1);
+    timer.representation = _select;
     timePrint = timer.toTimeString();
   }
 
@@ -204,7 +209,7 @@ class _TimeBoardState extends State<TimeBoard> {
           child: Text(timePrint,
               style: Theme.of(context)
                   .textTheme
-                  .display4
+                  .headline1
                   .apply(color: Colors.white, fontFamily: 'BreeSerif')),
         ),
         Row(

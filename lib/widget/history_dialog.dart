@@ -18,7 +18,7 @@ class _HistoryDialogState extends State<HistoryDialog> {
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
           title: Text('History'),
-          titleTextStyle: Theme.of(context).textTheme.display1,
+          titleTextStyle: Theme.of(context).textTheme.headline4,
           content: FutureBuilder(
             future: http
                 .get('http://kkdlau.student.ust.hk/record.php?password=3211'),

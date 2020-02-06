@@ -94,7 +94,7 @@ class SideBoardState extends State<SideBoard> {
               textAlign: TextAlign.center,
               style: Theme.of(context)
                   .textTheme
-                  .display4
+                  .headline1
                   .apply(color: Colors.white, fontFamily: 'BreeSerif')),
           Row(
             mainAxisSize: MainAxisSize.max,
@@ -105,7 +105,7 @@ class SideBoardState extends State<SideBoard> {
                 children: <Widget>[
                   Text(
                     'R:' + info.retry.toString(),
-                    style: Theme.of(context).textTheme.display2,
+                    style: Theme.of(context).textTheme.headline3,
                   ),
                   OutlineButton(
                       borderSide: BorderSide(color: Colors.white, width: 2.0),
@@ -126,9 +126,47 @@ class SideBoardState extends State<SideBoard> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  OutlineButton(
+                      borderSide: BorderSide(color: Colors.white, width: 2.0),
+                      onPressed: gameState.data == GameState.Versus &&
+                              info.freeRugby != 5
+                          ? () {
+                              setState(() {
+                                info.freeRugby++;
+                                informListener(
+                                    'Places try balls back to the rack. Current try ball: ' +
+                                        info.freeRugby.toString());
+                                team.update();
+                              });
+                            }
+                          : null,
+                      child: Text('Add try ball'),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0))),
+                  OutlineButton(
+                      borderSide: BorderSide(color: Colors.white, width: 2.0),
+                      onPressed: gameState.data == GameState.Versus
+                          ? () {
+                              setState(() {
+                                info.availableKickBall++;
+                                team.update();
+                                informListener(
+                                    'Places kick balls back to the tee. Current kick ball: ' +
+                                        info.availableKickBall.toString());
+                              });
+                            }
+                          : null,
+                      child: Text('Add kick ball'),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0)))
+                ],
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
                   Text(
                     'V: ' + info.violation.toString(),
-                    style: Theme.of(context).textTheme.display2,
+                    style: Theme.of(context).textTheme.headline3,
                   ),
                   OutlineButton(
                       borderSide: BorderSide(color: Colors.white, width: 2.0),
@@ -170,7 +208,7 @@ class SideBoardState extends State<SideBoard> {
                                 });
                             }
                           : null,
-                      child: Text('Got Try ball'),
+                      child: Text('Get try ball'),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0)))),
               SizedBox(
@@ -193,7 +231,7 @@ class SideBoardState extends State<SideBoard> {
                               });
                             }
                           : null,
-                      child: Text('Received ball'),
+                      child: Text('Receive ball'),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0)))),
               SizedBox(
@@ -224,6 +262,64 @@ class SideBoardState extends State<SideBoard> {
           Row(
             children: <Widget>[
               Expanded(
+                  child: OutlineButton(
+                      borderSide: BorderSide(color: Colors.white, width: 2.0),
+                      onPressed: gameState.data == GameState.Versus
+                          ? () {
+                              if (info.freeRugby > 0)
+                                setState(() {
+                                  info.freeRugby--;
+                                  informListener('Failed to get try ball');
+                                  team.update();
+                                });
+                            }
+                          : null,
+                      child: Text('Fail: Get try ball'),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0)))),
+              SizedBox(
+                width: 10.0,
+              ),
+              Expanded(
+                  child: OutlineButton(
+                      borderSide: BorderSide(color: Colors.white, width: 2.0),
+                      onPressed: gameState.data == GameState.Versus &&
+                              info.availableTryBall > 0
+                          ? () {
+                              setState(() {
+                                info.availableTryBall--;
+                                informListener('Failed to receive try ball.');
+                                team.update();
+                              });
+                            }
+                          : null,
+                      child: Text('Fail: Receive'),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0)))),
+              SizedBox(
+                width: 10.0,
+              ),
+              Expanded(
+                  child: OutlineButton(
+                      borderSide: BorderSide(color: Colors.white, width: 2.0),
+                      onPressed: gameState.data == GameState.Versus &&
+                              info.availableScoreBall > 0
+                          ? () {
+                              setState(() {
+                                info.availableScoreBall--;
+                                informListener('Failed to score spots.');
+                                team.update();
+                              });
+                            }
+                          : null,
+                      child: Text('Fail: Score spots'),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0))))
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
                 child: OutlineButton(
                     borderSide: BorderSide(color: Colors.white, width: 2.0),
                     onPressed: gameState.data == GameState.Versus &&
@@ -241,7 +337,7 @@ class SideBoardState extends State<SideBoard> {
                             });
                           }
                         : null,
-                    child: Text('Got kick ball'),
+                    child: Text('Get kick ball'),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0))),
               )
@@ -263,7 +359,7 @@ class SideBoardState extends State<SideBoard> {
                             });
                           }
                         : null,
-                    child: Text('Got opponent’s ball'),
+                    child: Text('Get opponent’s ball'),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0))),
               )
@@ -326,6 +422,21 @@ class SideBoardState extends State<SideBoard> {
                         }
                       : null,
                   child: Text('Z3'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0))),
+              OutlineButton(
+                  borderSide: BorderSide(color: Colors.white, width: 2.0),
+                  onPressed: gameState.data == GameState.Versus &&
+                          info.availableKickBall > 0
+                      ? () {
+                          setState(() {
+                            info.availableKickBall--;
+                            informListener('Failed to kick.');
+                            team.update();
+                          });
+                        }
+                      : null,
+                  child: Text('Fail'),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0)))
             ],
