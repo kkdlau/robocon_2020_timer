@@ -12,6 +12,7 @@ class WOutlineButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlineButton(
+        highlightedBorderColor: Colors.white,
         borderSide: BorderSide(color: Colors.white, width: 2.0),
         onPressed: onPressed,
         child: child,
