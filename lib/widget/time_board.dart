@@ -9,6 +9,7 @@ import 'package:robocon_2020_timer/widget/change_notifier.dart';
 import 'package:robocon_2020_timer/widget/team.dart';
 import 'package:robocon_2020_timer/widget/team_notifier.dart';
 import 'package:http/http.dart' as http;
+import 'package:robocon_2020_timer/widget/white_outline_btn.dart';
 
 enum GameState { Preparation, Versus, Waiting, End }
 
@@ -46,6 +47,7 @@ class _TimeBoardState extends State<TimeBoard> {
 
   void startTimer(Duration time, GameState state) {
     timer = CountTimer(duration: time);
+    timer.representation = _select;
     final Notifier<GameState> gameStateProvider =
         Provider.of<Notifier<GameState>>(context, listen: false);
     final Notifier<CountTimer> timerProvider =
@@ -215,37 +217,34 @@ class _TimeBoardState extends State<TimeBoard> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            OutlineButton(
-                borderSide: BorderSide(color: Colors.white70, width: 2.0),
-                child: Text('Start'),
+            WOutlineButton(
                 onPressed: canStart
                     ? () {
-                        if (_oneMinutePre)
-                          startTimer(
-                              Duration(minutes: 1), GameState.Preparation);
-                        else
-                          startTimer(Duration(minutes: 3), GameState.Versus);
+                        _oneMinutePre
+                            ? startTimer(
+                                Duration(minutes: 1), GameState.Preparation)
+                            : startTimer(
+                                Duration(minutes: 3), GameState.Versus);
                       }
                     : null,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0))),
+                child: canStart
+                    ? gameStateProvider.data == GameState.Versus ||
+                            gameStateProvider.data == GameState.Preparation
+                        ? Text('Restart')
+                        : Text('Start')
+                    : Text('Restart')),
             SizedBox(
               width: 20.0,
             ),
-            OutlineButton(
-                textColor: Colors.white70,
-                borderSide: BorderSide(color: Colors.white70, width: 2.0),
-                child: canPause ? Text('Pause') : Text('Resume'),
+            WOutlineButton(
                 onPressed: canStart && !timer.pasued
                     ? null
                     : canPause ? pauseTimer : resumeTimer,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0))),
+                child: canPause ? Text('Pause') : Text('Resume')),
             SizedBox(
               width: 20.0,
             ),
-            OutlineButton(
-                borderSide: BorderSide(color: Colors.white, width: 2.0),
+            WOutlineButton(
                 onPressed: () {
                   if (bgColor.data[0] == Colors.red[900])
                     bgColor
@@ -259,26 +258,24 @@ class _TimeBoardState extends State<TimeBoard> {
                   team.blueTeamData = temporary;
                   team.update();
                 },
-                child: Text('Reverse color'),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0))),
+                child: Text('Reverse color')),
           ],
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Text('MSm:'),
-            Radio(
-              groupValue: _select,
-              value: 0,
-              onChanged: (int index) {
-                setState(() {
-                  _select = index;
-                  timer.representation = index;
-                  timePrint = timer.toTimeString();
-                });
-              },
-            ),
+            // Text('MSm:'),
+            // Radio(
+            //   groupValue: _select,
+            //   value: 0,
+            //   onChanged: (int index) {
+            //     setState(() {
+            //       _select = index;
+            //       timer.representation = index;
+            //       timePrint = timer.toTimeString();
+            //     });
+            //   },
+            // ),
             Text('ms:'),
             Radio(
               groupValue: _select,
@@ -303,17 +300,16 @@ class _TimeBoardState extends State<TimeBoard> {
                 });
               },
             ),
-            Text('1 minute preparation: '),
+            Text('1 min: '),
             Checkbox(
               onChanged: (bool value) {
                 if (timer.pasued) return;
                 setState(() {
                   _oneMinutePre = value;
                   if (_oneMinutePre)
-                    presentTime = Duration(minutes: 1);
+                    timer.updateDuration(Duration(minutes: 1));
                   else
-                    presentTime = Duration(minutes: 3);
-                  timer = CountTimer(duration: presentTime);
+                    timer.updateDuration(Duration(minutes: 3));
                   timePrint = timer.toTimeString();
                 });
               },
@@ -381,14 +377,11 @@ class _TimeBoardState extends State<TimeBoard> {
             Expanded(
                 child: Padding(
               padding: const EdgeInsets.only(bottom: 20.0),
-              child: OutlineButton(
-                  borderSide: BorderSide(color: Colors.white, width: 2.0),
+              child: WOutlineButton(
                   onPressed: gameStateProvider.data == GameState.End
                       ? uploadToServer
                       : null,
-                  child: Text('Upload to server'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0))),
+                  child: Text('Upload to server')),
             ))
           ],
         )

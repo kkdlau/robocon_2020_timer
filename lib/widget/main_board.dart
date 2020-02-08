@@ -10,7 +10,6 @@ import 'package:robocon_2020_timer/widget/team.dart';
 import 'package:robocon_2020_timer/widget/time_board.dart';
 import 'package:robocon_2020_timer/widget/change_notifier.dart';
 import 'package:robocon_2020_timer/widget/team_notifier.dart';
-import 'dart:html' as html;
 
 class MainBoard extends StatelessWidget {
   const MainBoard({Key key}) : super(key: key);
@@ -59,20 +58,6 @@ class MainBoard extends StatelessWidget {
                   ),
                   Row(
                     children: rowChild,
-                  ),
-                  Positioned.fill(
-                    child: Align(
-                      child: FlatButton.icon(
-                        onPressed: () {
-                          html.window.open(
-                              'https://github.com/kkdlau/robocon_2020_timer/issues',
-                              '');
-                        },
-                        icon: Icon(Icons.report_problem),
-                        label: Text('Report bugs / suggestions'),
-                      ),
-                      alignment: Alignment.bottomLeft,
-                    ),
                   ),
                   Positioned.fill(
                     child: Align(
