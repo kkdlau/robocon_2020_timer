@@ -1,5 +1,3 @@
-enum CountControl { countup, countdown }
-
 class CountTimer {
   Duration duration;
 
@@ -8,18 +6,21 @@ class CountTimer {
 
   /// the real duration.
   Duration _duration;
-  CountControl control;
   DateTime _begin;
   Duration _remainingTime;
   bool pasued = false;
 
-  CountTimer({this.duration, this.control = CountControl.countdown}) {
+  CountTimer({this.duration, this.representation}) {
     _remainingTime = duration;
   }
 
   void start() {
     _begin = DateTime.now();
     _duration = this.duration;
+  }
+
+  void updateDuration(Duration d) {
+    _remainingTime = d;
   }
 
   void pause() {
