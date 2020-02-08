@@ -376,65 +376,64 @@ class SideBoardState extends State<SideBoard> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: <Widget>[
               Text('Kick ball at: '),
-              OutlineButton(
-                  borderSide: BorderSide(color: Colors.white, width: 2.0),
-                  onPressed: gameState.data == GameState.Versus &&
-                          info.availableKickBall > 0
-                      ? () {
-                          setState(() {
-                            info.scoredSpot--;
-                            info.score += 5;
-                            info.availableKickBall--;
-                            informListener(
-                                'Successfully kicked ball at Z1. Current Score: ' +
-                                    info.score.toString());
-                            team.update();
-                          });
-                        }
-                      : null,
-                  child: Text('Z1'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0))),
-              OutlineButton(
-                  borderSide: BorderSide(color: Colors.white, width: 2.0),
-                  onPressed: gameState.data == GameState.Versus &&
-                          info.availableKickBall > 0
-                      ? () {
-                          setState(() {
-                            info.scoredSpot--;
-                            info.score += 10;
-                            info.availableKickBall--;
-                            informListener(
-                                'Successfully kicked ball at Z2. Current Score: ' +
-                                    info.score.toString());
-                            team.update();
-                          });
-                        }
-                      : null,
-                  child: Text('Z2'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0))),
-              OutlineButton(
-                  borderSide: BorderSide(color: Colors.white, width: 2.0),
-                  onPressed: gameState.data == GameState.Versus &&
-                          info.availableKickBall > 0
-                      ? () {
-                          setState(() {
-                            info.scoredSpot--;
-                            info.score += 20;
-                            info.availableKickBall--;
-                            informListener(
-                                'Successfully kicked ball at Z3. Current Score: ' +
-                                    info.score.toString());
-                            team.update();
-                          });
-                        }
-                      : null,
-                  child: Text('Z3'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0))),
-              OutlineButton(
-                  borderSide: BorderSide(color: Colors.white, width: 2.0),
+              Tooltip(
+                message: '5 points',
+                child: WOutlineButton(
+                    onPressed: gameState.data == GameState.Versus &&
+                            info.availableKickBall > 0
+                        ? () {
+                            setState(() {
+                              info.scoredSpot--;
+                              info.score += 5;
+                              info.availableKickBall--;
+                              informListener(
+                                  'Successfully kicked ball at Z3. Current Score: ' +
+                                      info.score.toString());
+                              team.update();
+                            });
+                          }
+                        : null,
+                    child: Text('Z1')),
+              ),
+              Tooltip(
+                message: '10 points',
+                child: WOutlineButton(
+                    onPressed: gameState.data == GameState.Versus &&
+                            info.availableKickBall > 0
+                        ? () {
+                            setState(() {
+                              info.scoredSpot--;
+                              info.score += 10;
+                              info.availableKickBall--;
+                              informListener(
+                                  'Successfully kicked ball at Z3. Current Score: ' +
+                                      info.score.toString());
+                              team.update();
+                            });
+                          }
+                        : null,
+                    child: Text('Z2')),
+              ),
+              Tooltip(
+                message: '20 points',
+                child: WOutlineButton(
+                    onPressed: gameState.data == GameState.Versus &&
+                            info.availableKickBall > 0
+                        ? () {
+                            setState(() {
+                              info.scoredSpot--;
+                              info.score += 20;
+                              info.availableKickBall--;
+                              informListener(
+                                  'Successfully kicked ball at Z3. Current Score: ' +
+                                      info.score.toString());
+                              team.update();
+                            });
+                          }
+                        : null,
+                    child: Text('Z3')),
+              ),
+              WOutlineButton(
                   onPressed: gameState.data == GameState.Versus &&
                           info.availableKickBall > 0
                       ? () {
@@ -446,9 +445,7 @@ class SideBoardState extends State<SideBoard> {
                           });
                         }
                       : null,
-                  child: Text('Fail'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0)))
+                  child: Text('Fail'))
             ],
           ),
           Align(
