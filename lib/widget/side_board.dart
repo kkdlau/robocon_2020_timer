@@ -72,12 +72,18 @@ class SideBoardState extends State<SideBoard> {
     team.update();
   }
 
-  void discordMessage() {
+  void discordAction() {
     final TeamNotifier team = Provider.of<TeamNotifier>(context, listen: false);
     if (widget.teamColor == Colors.red[900]) {
-      if (team.redTeamData.length > 1) team.redTeamData.removeAt(0);
+      if (team.redTeamData.length > 1) {
+        team.redTeamData.removeAt(0);
+        team.redTeamInfo.undoAction.removeLast()();
+      }
     } else {
-      if (team.blueTeamData.length > 1) team.blueTeamData.removeAt(0);
+      if (team.blueTeamData.length > 1) {
+        team.blueTeamData.removeAt(0);
+        team.blueTeamInfo.undoAction.removeLast()();
+      }
     }
     team.update();
   }
@@ -136,12 +142,19 @@ class SideBoardState extends State<SideBoard> {
                                 setState(() {
                                   _retrying = true;
                                   info.retry++;
+                                  info.undoAction.add(() {
+                                    _retrying = false;
+                                    info.retry--;
+                                  });
                                   informListener('Asked for retry.');
                                   team.update();
                                 });
                               } else {
                                 setState(() {
                                   _retrying = false;
+                                  info.undoAction.add(() {
+                                    _retrying = true;
+                                  });
                                   informListener(
                                       'Game start after aksed for retry.');
                                   team.update();
@@ -162,6 +175,9 @@ class SideBoardState extends State<SideBoard> {
                         ? () {
                             setState(() {
                               info.freeRugby++;
+                              info.undoAction.add(() {
+                                info.freeRugby--;
+                              });
                               informListener(
                                   'Places try balls back to the rack. Current try ball: ' +
                                       info.freeRugby.toString());
@@ -176,6 +192,9 @@ class SideBoardState extends State<SideBoard> {
                           ? () {
                               setState(() {
                                 info.availableKickBall++;
+                                info.undoAction.add(() {
+                                  info.availableKickBall--;
+                                });
                                 team.update();
                                 informListener(
                                     'Places kick balls back to the tee. Current kick ball: ' +
@@ -198,6 +217,9 @@ class SideBoardState extends State<SideBoard> {
                           ? () {
                               setState(() {
                                 info.violation++;
+                                info.undoAction.add(() {
+                                  info.violation--;
+                                });
                                 team.update();
                                 informListener('Acted in violation.');
                               });
@@ -223,6 +245,10 @@ class SideBoardState extends State<SideBoard> {
                                 setState(() {
                                   info.freeRugby--;
                                   info.availableTryBall++;
+                                  info.undoAction.add(() {
+                                    info.freeRugby++;
+                                    info.availableTryBall--;
+                                  });
                                   informListener('Got 1 try ball. Ramained: ' +
                                       info.freeRugby.toString());
                                   team.update();
@@ -242,6 +268,11 @@ class SideBoardState extends State<SideBoard> {
                                 info.score++;
                                 info.availableTryBall--;
                                 info.availableScoreBall++;
+                                info.undoAction.add(() {
+                                  info.score--;
+                                  info.availableTryBall++;
+                                  info.availableScoreBall--;
+                                });
                                 informListener(
                                     'Received ball. Current Score: ' +
                                         info.score.toString());
@@ -260,8 +291,13 @@ class SideBoardState extends State<SideBoard> {
                           ? () {
                               setState(() {
                                 info.score += 2;
-                                info.scoredSpot += 1;
+                                info.scoredSpot++;
                                 info.availableScoreBall--;
+                                info.undoAction.add(() {
+                                  info.score -= 2;
+                                  info.scoredSpot--;
+                                  info.availableScoreBall++;
+                                });
                                 informListener(
                                     'Scored spots, got 2 points! Current score: ' +
                                         info.score.toString());
@@ -281,6 +317,9 @@ class SideBoardState extends State<SideBoard> {
                               if (info.freeRugby > 0)
                                 setState(() {
                                   info.freeRugby--;
+                                  info.undoAction.add(() {
+                                    info.freeRugby++;
+                                  });
                                   informListener('Failed to get try ball');
                                   team.update();
                                 });
@@ -292,14 +331,17 @@ class SideBoardState extends State<SideBoard> {
               ),
               Expanded(
                   child: WOutlineButton(
-                      onPressed: gameState.data == GameState.Versus
+                      onPressed: gameState.data == GameState.Versus &&
+                              info.availableTryBall > 0
                           ? () {
-                              if (info.freeRugby > 0)
-                                setState(() {
-                                  info.availableTryBall--;
-                                  informListener('Failed to receive try ball.');
-                                  team.update();
+                              setState(() {
+                                info.availableTryBall--;
+                                info.undoAction.add(() {
+                                  info.availableTryBall++;
                                 });
+                                informListener('Failed to receive try ball.');
+                                team.update();
+                              });
                             }
                           : null,
                       child: Text('Fail: Receive'))),
@@ -313,6 +355,9 @@ class SideBoardState extends State<SideBoard> {
                           ? () {
                               setState(() {
                                 info.availableScoreBall--;
+                                info.undoAction.add(() {
+                                  info.availableScoreBall++;
+                                });
                                 informListener('Failed to score spots.');
                                 team.update();
                               });
@@ -342,6 +387,12 @@ class SideBoardState extends State<SideBoard> {
                               info.scoredSpot--;
                               kickBallProvider
                                   .informListener(kickBallProvider.data - 1);
+                              info.undoAction.add(() {
+                                info.availableKickBall--;
+                                info.scoredSpot++;
+                                kickBallProvider
+                                    .informListener(kickBallProvider.data + 1);
+                              });
                               informListener('Got 1 kick ball. Remaining: ' +
                                   kickBallProvider.data.toString());
                               team.update();
@@ -360,6 +411,9 @@ class SideBoardState extends State<SideBoard> {
                         ? () {
                             setState(() {
                               info.score += 10;
+                              info.undoAction.add(() {
+                                info.score -= 10;
+                              });
                               informListener(
                                   'Miss shooting from opponent. Current Score: ' +
                                       info.score.toString());
@@ -386,6 +440,11 @@ class SideBoardState extends State<SideBoard> {
                               info.scoredSpot--;
                               info.score += 5;
                               info.availableKickBall--;
+                              info.undoAction.add(() {
+                                info.scoredSpot++;
+                                info.score -= 5;
+                                info.availableKickBall++;
+                              });
                               informListener(
                                   'Successfully kicked ball at Z3. Current Score: ' +
                                       info.score.toString());
@@ -405,6 +464,11 @@ class SideBoardState extends State<SideBoard> {
                               info.scoredSpot--;
                               info.score += 10;
                               info.availableKickBall--;
+                              info.undoAction.add(() {
+                                info.scoredSpot++;
+                                info.score -= 10;
+                                info.availableKickBall++;
+                              });
                               informListener(
                                   'Successfully kicked ball at Z3. Current Score: ' +
                                       info.score.toString());
@@ -424,6 +488,11 @@ class SideBoardState extends State<SideBoard> {
                               info.scoredSpot--;
                               info.score += 20;
                               info.availableKickBall--;
+                              info.undoAction.add(() {
+                                info.scoredSpot++;
+                                info.score -= 20;
+                                info.availableKickBall++;
+                              });
                               informListener(
                                   'Successfully kicked ball at Z3. Current Score: ' +
                                       info.score.toString());
@@ -453,7 +522,7 @@ class SideBoardState extends State<SideBoard> {
             child: UnconstrainedBox(
                 child: WOutlineButton(
                     onPressed: gameState.data == GameState.Versus
-                        ? discordMessage
+                        ? discordAction
                         : null,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

@@ -7,6 +7,7 @@ class TeamInfo {
   int violation = 0;
   int availableKickBall = 0;
   int scoredSpot = 0;
+  List<Function> undoAction = [];
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> obj = {};
