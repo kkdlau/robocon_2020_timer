@@ -206,13 +206,16 @@ class _TimeBoardState extends State<TimeBoard> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(timePrint,
-              style: Theme.of(context)
-                  .textTheme
-                  .headline1
-                  .apply(color: Colors.white, fontFamily: 'BreeSerif')),
+        Expanded(
+          flex: 3,
+          child: FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Text(timePrint,
+                style: Theme.of(context)
+                    .textTheme
+                    .headline1
+                    .apply(color: Colors.white, fontFamily: 'BreeSerif')),
+          ),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -332,6 +335,7 @@ class _TimeBoardState extends State<TimeBoard> {
               style: TextStyle(color: Colors.blue, fontFamily: 'BreeSerif')),
         ),
         Expanded(
+          flex: 2,
           child: Scrollbar(
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
@@ -358,6 +362,7 @@ class _TimeBoardState extends State<TimeBoard> {
           ),
         ),
         Expanded(
+          flex: 2,
           child: Scrollbar(
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,

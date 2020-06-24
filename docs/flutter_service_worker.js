@@ -1,17 +1,20 @@
 'use strict';
 const CACHE_NAME = 'flutter-app-cache';
 const RESOURCES = {
-  "/index.html": "fbcc824b6ced05e85ecbee5df111ba9e",
-"/main.dart.js.deps": "d9b57c9d9fb88776273a00ce056e2cac",
-"/main.dart.js": "4f8baa5e7da5c8dd0a102ced9f19c475",
-"/logo.png": "89246628b94e469988146d59733164a5",
-"/assets/LICENSE": "e6ebb448a077395ec0b50d82ce1dc8ba",
-"/assets/AssetManifest.json": "8a4c4b77dc1bfb1891d7fac0ec2fd3c4",
-"/assets/FontManifest.json": "cd5d2c8260d1c8497ae34010dc00cfc2",
-"/assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "115e937bb829a890521f72d2e664b632",
-"/assets/fonts/MaterialIcons-Regular.ttf": "56d3ffdef7a25659eab6a68a3fbfaf16",
-"/assets/assets/BreeSerif-Regular.ttf": "14aaff013398c35430cc935d1e4dcd99",
-"/assets/assets/logo.png": "89246628b94e469988146d59733164a5"
+  "index.html": "4411f1c7a522fdbbf99aa74bb8047a89",
+"/": "4411f1c7a522fdbbf99aa74bb8047a89",
+"main.dart.js.deps": "d9b57c9d9fb88776273a00ce056e2cac",
+"main.dart.js": "7c5c37eb2a5862121eaab797daeeda41",
+"logo.png": "89246628b94e469988146d59733164a5",
+"assets/LICENSE": "a7402085105f2f9af9f52fa9f5f1e29f",
+"assets/AssetManifest.json": "49829652119f183b4a244d9e190228ef",
+"assets/FontManifest.json": "cd5d2c8260d1c8497ae34010dc00cfc2",
+"assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "115e937bb829a890521f72d2e664b632",
+"assets/fonts/MaterialIcons-Regular.ttf": "56d3ffdef7a25659eab6a68a3fbfaf16",
+"assets/assets/BreeSerif-Regular.ttf": "14aaff013398c35430cc935d1e4dcd99",
+"assets/assets/logo.png": "89246628b94e469988146d59733164a5",
+"assets/assets/bee.mp3": "49927dd1a5160dcd5f057e90aa61aae0",
+"assets/assets/start_end.mp3": "6ac2f6809cf9d8b9b638f8edc69480a0"
 };
 
 self.addEventListener('activate', function (event) {
@@ -33,9 +36,7 @@ self.addEventListener('fetch', function (event) {
         if (response) {
           return response;
         }
-        return fetch(event.request, {
-          credentials: 'include'
-        });
+        return fetch(event.request);
       })
   );
 });

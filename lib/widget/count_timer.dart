@@ -1,3 +1,7 @@
+import 'dart:js' as js;
+
+import 'package:flutter/foundation.dart';
+
 class CountTimer {
   Duration duration;
 
@@ -9,6 +13,7 @@ class CountTimer {
   DateTime _begin;
   Duration _remainingTime;
   bool pasued = false;
+  List<bool> called = [false, false, false, false, false, false];
 
   CountTimer({this.duration, this.representation}) {
     _remainingTime = duration;
@@ -17,10 +22,12 @@ class CountTimer {
   void start() {
     _begin = DateTime.now();
     _duration = this.duration;
+    called = [false, false, false, false, false, false];
   }
 
   void updateDuration(Duration d) {
     _remainingTime = d;
+    called = [false, false, false, false, false, false];
   }
 
   void pause() {
@@ -36,7 +43,15 @@ class CountTimer {
   Duration update() {
     Duration passed = DateTime.now().difference(_begin);
     if (!pasued) _remainingTime = this._duration - passed;
-
+    if (_remainingTime.inSeconds <= 5) {
+      if (!called[_remainingTime.inSeconds]) {
+        called[_remainingTime.inSeconds] = true;
+        if (_remainingTime.inSeconds == 0)
+          playAudio('assets/start_end.mp3');
+        else
+          playAudio('assets/bee.mp3');
+      }
+    }
     return _remainingTime;
   }
 
@@ -56,5 +71,11 @@ class CountTimer {
           (_remainingTime.inSeconds % 60).toString().padLeft(2, '0');
     else
       return _remainingTime.inSeconds.toString();
+  }
+
+  void playAudio(String path) {
+    if (kIsWeb) {
+      js.context.callMethod('playAudio', [path]);
+    }
   }
 }
