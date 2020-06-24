@@ -109,7 +109,7 @@ class _TimeBoardState extends State<TimeBoard> {
     Duration passed = timer.update();
     final Notifier<GameState> gameStateProvider =
         Provider.of<Notifier<GameState>>(context, listen: false);
-    if (passed.isNegative) {
+    if (passed.inSeconds == 0) {
       if (gameStateProvider.data == GameState.Versus) {
         timer = CountTimer(duration: Duration(seconds: 0));
         setState(() {

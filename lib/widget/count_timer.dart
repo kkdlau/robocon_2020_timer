@@ -13,7 +13,7 @@ class CountTimer {
   DateTime _begin;
   Duration _remainingTime;
   bool pasued = false;
-  List<bool> called = [false, false, false, false, false, false];
+  bool called = false;
 
   CountTimer({this.duration, this.representation}) {
     _remainingTime = duration;
@@ -22,12 +22,12 @@ class CountTimer {
   void start() {
     _begin = DateTime.now();
     _duration = this.duration;
-    called = [false, false, false, false, false, false];
+    called = false;
   }
 
   void updateDuration(Duration d) {
     _remainingTime = d;
-    called = [false, false, false, false, false, false];
+    called = false;
   }
 
   void pause() {
@@ -43,14 +43,9 @@ class CountTimer {
   Duration update() {
     Duration passed = DateTime.now().difference(_begin);
     if (!pasued) _remainingTime = this._duration - passed;
-    if (_remainingTime.inSeconds <= 5) {
-      if (!called[_remainingTime.inSeconds]) {
-        called[_remainingTime.inSeconds] = true;
-        if (_remainingTime.inSeconds == 0)
-          playAudio('assets/start_end.mp3');
-        else
-          playAudio('assets/bee.mp3');
-      }
+    if (_remainingTime.inSeconds == 5 && !called) {
+      playAudio('countdown_hk.mp3');
+      called = true;
     }
     return _remainingTime;
   }
