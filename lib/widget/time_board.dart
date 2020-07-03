@@ -31,6 +31,7 @@ class _TimeBoardState extends State<TimeBoard> {
   bool canStart;
   bool canPause;
   bool _oneMinutePre;
+  bool useJP = false;
 
   @override
   void initState() {
@@ -39,8 +40,8 @@ class _TimeBoardState extends State<TimeBoard> {
     canStart = true;
     canPause = true;
     _oneMinutePre = true;
-    timer = CountTimer(duration: Duration(minutes: 1));
-    presentTime = Duration(minutes: 1);
+    timer = CountTimer(duration: Duration(seconds: 63));
+    presentTime = Duration(seconds: 63);
     timer.representation = _select;
     timePrint = timer.toTimeString();
   }
@@ -84,7 +85,7 @@ class _TimeBoardState extends State<TimeBoard> {
       canPause = true;
       canStart = false;
     });
-    timer.start();
+    timer.start(useJP: useJP);
     SchedulerBinding.instance.addPostFrameCallback(updateTimer);
   }
 
@@ -225,7 +226,7 @@ class _TimeBoardState extends State<TimeBoard> {
                     ? () {
                         _oneMinutePre
                             ? startTimer(
-                                Duration(minutes: 1), GameState.Preparation)
+                                Duration(seconds: 63), GameState.Preparation)
                             : startTimer(
                                 Duration(minutes: 3), GameState.Versus);
                       }
@@ -310,13 +311,22 @@ class _TimeBoardState extends State<TimeBoard> {
                 setState(() {
                   _oneMinutePre = value;
                   if (_oneMinutePre)
-                    timer.updateDuration(Duration(minutes: 1));
+                    timer.updateDuration(Duration(seconds: 63));
                   else
                     timer.updateDuration(Duration(minutes: 3));
                   timePrint = timer.toTimeString();
                 });
               },
               value: _oneMinutePre,
+            ),
+            Text('JP ver: '),
+            Checkbox(
+              onChanged: (bool value) {
+                setState(() {
+                  useJP = value;
+                });
+              },
+              value: useJP,
             )
           ],
         ),

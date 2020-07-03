@@ -14,15 +14,24 @@ class CountTimer {
   Duration _remainingTime;
   bool pasued = false;
   bool called = false;
+  bool _useJP = false;
 
   CountTimer({this.duration, this.representation}) {
     _remainingTime = duration;
   }
 
-  void start() {
-    _begin = DateTime.now();
+  void start({bool useJP = false}) {
+    _useJP = useJP;
+    final DateTime start = DateTime.now();
+    _begin = start.add(Duration(milliseconds: 1000 - start.millisecond));
     _duration = this.duration;
     called = false;
+    if (_duration.inSeconds == 63) {
+      if (useJP)
+        playAudio('before_one_min_jp.mp3');
+      else
+        playAudio('before_one_min.mp3');
+    }
   }
 
   void updateDuration(Duration d) {
