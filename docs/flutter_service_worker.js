@@ -7,7 +7,7 @@ const RESOURCES = {
 "main.dart.js": "b242db430a87d38019c2d0569b5406de",
 "logo.png": "89246628b94e469988146d59733164a5",
 "before_one_min_jp.mp3": "afe6506ef7e950b194be100d15e09a08",
-"before_one_min.mp3": "0bff7455b302a835f707a401942ff117",
+"before_one_min.mp3": "55d9e775a1349801e2d7655d3707f9b2",
 "countdown_hk.mp3": "6c89087143f93d78e3e57e83de99d9f1",
 "assets/LICENSE": "a7402085105f2f9af9f52fa9f5f1e29f",
 "assets/AssetManifest.json": "49829652119f183b4a244d9e190228ef",
