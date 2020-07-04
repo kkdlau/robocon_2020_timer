@@ -437,11 +437,9 @@ class SideBoardState extends State<SideBoard> {
                             info.availableKickBall > 0
                         ? () {
                             setState(() {
-                              info.scoredSpot--;
                               info.score += 5;
                               info.availableKickBall--;
                               info.undoAction.add(() {
-                                info.scoredSpot++;
                                 info.score -= 5;
                                 info.availableKickBall++;
                               });
@@ -461,11 +459,9 @@ class SideBoardState extends State<SideBoard> {
                             info.availableKickBall > 0
                         ? () {
                             setState(() {
-                              info.scoredSpot--;
                               info.score += 10;
                               info.availableKickBall--;
                               info.undoAction.add(() {
-                                info.scoredSpot++;
                                 info.score -= 10;
                                 info.availableKickBall++;
                               });
@@ -485,11 +481,9 @@ class SideBoardState extends State<SideBoard> {
                             info.availableKickBall > 0
                         ? () {
                             setState(() {
-                              info.scoredSpot--;
                               info.score += 20;
                               info.availableKickBall--;
                               info.undoAction.add(() {
-                                info.scoredSpot++;
                                 info.score -= 20;
                                 info.availableKickBall++;
                               });
@@ -507,8 +501,10 @@ class SideBoardState extends State<SideBoard> {
                           info.availableKickBall > 0
                       ? () {
                           setState(() {
-                            info.scoredSpot--;
                             info.availableKickBall--;
+                            info.undoAction.add(() {
+                              info.availableKickBall++;
+                            });
                             informListener('Failed to kick.');
                             team.update();
                           });
