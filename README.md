@@ -12,11 +12,11 @@ A cross-platform timer and scoreboard which desgins for robocon 2020.
 
 To debug this project, install Flutter plugin in VScode, and follow the [guideline](https://flutter.dev/docs/testing/debugging).
 
-## Deployment
+## Live Demo
 
-https://kkdlau.student.ust.hk
+https://kkdlau.github.io/robocon_2020_timer/#/
 
-## TODO
+## Note
 
-* add backend support (upload files, review records)
+Robocon 2020 ended so I archived this project :)
 
